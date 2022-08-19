@@ -1,0 +1,1 @@
+- Cook 2022 Figure 1c:Press rate and peak time around the reward and Ext.Fig 1a,b : correlation analyses for time 30sec(increases wround reward) and 70 sec (decreases), although these are for reward omission (probe) trials which I do not have at the moment!

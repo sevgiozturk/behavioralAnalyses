@@ -1,0 +1,107 @@
+function plotHoldReactTimesEachDayAllMice(globalMiceIdPrefix, mouseIds, dataPath)
+           
+    maxY = 1000; %max(max(max(dailyHoldTimes)),max(max(dailyReactTimes)))+3000;
+    dataFile = ['data-i' globalMiceIdPrefix '*-*.mat'];        
+    dirStruct = dir([dataPath dataFile]);
+    [~,structIds] = sort([dirStruct.datenum]);
+        
+    indArr=1;
+    arrDays = strings();
+    % get all available dates
+    for j=1:length(structIds)
+        fileName = dirStruct(structIds(j)).name;
+        fullFilename = [dataPath fileName];
+        data = load(fullFilename);
+        input = data.input;
+        fixedHold = input.fixedReqHoldTimeMs;
+        mouseId_trainingDay =  extractBetween(fileName,['data-i' globalMiceIdPrefix],'.mat');
+        mouseId_trainingDay = mouseId_trainingDay{:};
+        mouseId = extractBetween(mouseId_trainingDay,1,2);
+        mouseId = mouseId{:};
+        trainingDay = extractBetween(mouseId_trainingDay,'-','-');
+        trainingDay = trainingDay{:};
+        if ~contains(arrDays,trainingDay)
+            arrDays(indArr) = trainingDay;
+            indArr = indArr+1;
+        end
+    end
+    
+    maxMiceCount = 10;
+    maxTrialCount = 2000;
+    
+    % for each day, get all mice data
+    for k=1:length(arrDays)
+        dataFile = ['data-i' globalMiceIdPrefix '*-' char(arrDays(k)) '-*.mat'];        
+        dirStruct = dir([dataPath dataFile]); % select all mice data for that specific day
+        arrHoldTimesMice = nan(maxMiceCount,maxTrialCount); % for each day, define these from scratch
+        arrReactTimesMice = nan(maxMiceCount,maxTrialCount);
+    
+        for mouse=1:length(dirStruct)
+            fileName = dirStruct(mouse).name;
+            fullFilename = [dataPath fileName];
+            data = load(fullFilename);
+            input = data.input;
+            arrHoldTimes = cell2mat(input.holdTimesMs);
+            arrReactTimes = cell2mat(input.reactTimesMs);
+            arrHoldTimesMice(mouse,1:length(arrHoldTimes)) = arrHoldTimes;
+            arrReactTimesMice(mouse,1:length(arrReactTimes)) = arrReactTimes;
+        end
+        
+        % Mean/Std/Sem for Hold Times
+        meanHoldTimes = nanmean(arrHoldTimesMice,1);
+        meanHoldTimes = meanHoldTimes(~isnan(meanHoldTimes));
+
+        stdHoldTimes = nanstd(arrHoldTimesMice,1);
+        stdHoldTimes = stdHoldTimes(~isnan(stdHoldTimes));
+        nSessions = sum(~isnan(arrHoldTimesMice),1);
+        nSessions = nSessions(nSessions~=0);
+        semHoldTimes = stdHoldTimes./sqrt(nSessions);
+        
+        % Mean/Std/Sem for React Times
+        meanReactTimes = nanmean(arrReactTimesMice,1);
+        meanReactTimes = meanReactTimes(~isnan(meanReactTimes));
+
+        stdReactTimes = nanstd(arrReactTimesMice,1);
+        stdReactTimes = stdReactTimes(~isnan(stdReactTimes));
+        nSessions = sum(~isnan(arrReactTimesMice),1);
+        nSessions = nSessions(nSessions~=0);
+        semReactTimes = stdReactTimes./sqrt(nSessions);
+        
+        f = figure('Name', sprintf('Hold/React times accross sessions for day %s', char(arrDays(k))));
+        set(f, 'Position', [1000 0 1600 1000]);
+        hold on
+        
+        xs = [1:length(meanHoldTimes)];
+        subplot(1,2,1)
+        scatter(xs, meanHoldTimes,'filled')
+        grid on;
+        hold on
+        errorbar(xs, meanHoldTimes, semHoldTimes,'o');
+        %set(gca, 'XTick', arrDays);
+        ylim([0 maxY]);
+        title('Hold times')
+
+        xs = [1:length(meanReactTimes)];
+        subplot(1,2,2)
+        scatter(xs, meanReactTimes,'filled')
+        grid on;
+        hold on
+        errorbar(xs, meanReactTimes, semReactTimes,'o');
+        %set(gca, 'XTick', arrDays);
+        ylim([0 maxY]);
+        title('React times')
+
+        % Give common xlabel, ylabel and title to your figure
+        han=axes(f,'visible','off');         
+        han.XLabel.Visible='on';
+        han.YLabel.Visible='on';
+        ylabel(han,'Time (ms)');
+        xlabel(han,'Trials');
+
+        bigTitle = sprintf('Day: %s with %d sessions',char(arrDays(k)), length(dirStruct));
+        %suptitle(bigTitle)
+        text(0.43, 1.06, bigTitle,'FontSize', 14, 'FontWeight', 'bold')
+
+        saveas(f, strcat(sprintf('out/HoldReactTimes_Day%s',char(arrDays(k))), '.png'));
+    end            
+end
