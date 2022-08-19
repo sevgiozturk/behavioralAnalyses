@@ -18,13 +18,13 @@ for a=1:length(mouseIds)
         %S = S(~[S.isdir]);
         [~,arrDays] = sort([dirStruct.datenum]);
 
-%         plotDailyHoldReactPDFs(arrDays, globalMiceIdPrefix, mouseId, dirStruct, dataPath);        
-%         plotDailyMeanHoldReactTimes(arrDays, globalMiceIdPrefix, mouseId, dirStruct, dataPath);        
-%         plotDailyBehavioralOutcomeCounts(arrDays, globalMiceIdPrefix, mouseId, dirStruct, dataPath);
-%         plotDailyHoldReactCDFs(arrDays, globalMiceIdPrefix, mouseId, dirStruct, dataPath);
-%         plotHoldReactTimesAccrossSessions(arrDays, globalMiceIdPrefix, mouseId, dirStruct, dataPath);
-%         plotHoldReactTimesEachDay(arrDays, globalMiceIdPrefix, mouseId, dirStruct, dataPath);
-%         plotHitHoldReactTimesEachDay(arrDays, globalMiceIdPrefix, mouseId, dirStruct, dataPath);
+        plotDailyHoldReactPDFs(arrDays, globalMiceIdPrefix, mouseId, dirStruct, dataPath);        
+        plotDailyMeanHoldReactTimes(arrDays, globalMiceIdPrefix, mouseId, dirStruct, dataPath);        
+        plotDailyBehavioralOutcomeCounts(arrDays, globalMiceIdPrefix, mouseId, dirStruct, dataPath);
+        plotDailyHoldReactCDFs(arrDays, globalMiceIdPrefix, mouseId, dirStruct, dataPath);
+        plotHoldReactTimesAccrossSessions(arrDays, globalMiceIdPrefix, mouseId, dirStruct, dataPath);
+        plotHoldReactTimesEachDay(arrDays, globalMiceIdPrefix, mouseId, dirStruct, dataPath);
+        plotHitHoldReactTimesEachDay(arrDays, globalMiceIdPrefix, mouseId, dirStruct, dataPath);
         %plotDailyQuadraturePosition(arrDays, globalMiceIdPrefix, mouseId, dirStruct, dataPath)
         close all
 end
